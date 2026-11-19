@@ -6,6 +6,7 @@
 [![SQLite FTS5](https://img.shields.io/badge/Search-SQLite_FTS5_%2B_BM25-003B57.svg?logo=sqlite)](https://www.sqlite.org/fts5.html)
 [![Dublin Core](https://img.shields.io/badge/Metadata-Dublin_Core_ISO_15836-B8860B.svg)](https://www.dublincore.org)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000.svg?logo=vercel)](docs/vercel-deployment.md)
+[![Release](https://img.shields.io/badge/Release-v1.0.1--verified-green.svg)](https://github.com/shiwamsingh54321op-web/Digital-Repository-of-Selected-IKS-Texts-and-Resources)
 
 An academic-grade digital library and information retrieval prototype dedicated to the **Indian Knowledge Systems (IKS)**. Engineered to categorize, index, search, and legally govern classical Indian texts, manuscripts, translations, and research resources following **Dublin Core ISO 15836** metadata standards and **SQLite FTS5 BM25** probabilistic ranking.
 
