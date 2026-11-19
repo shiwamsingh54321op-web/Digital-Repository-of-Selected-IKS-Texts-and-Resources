@@ -86,6 +86,7 @@ export interface ResourceDetail extends Resource {
   download_allowed?: boolean;
   download_restriction_reason?: string | null;
   related_resources?: Resource[];
+  citations?: Record<string, string>;
 }
 
 export interface PaginatedResources {
@@ -105,7 +106,9 @@ export interface KnowledgeDomain {
   sanskrit_name?: string | null;
   description?: string | null;
   parent_id?: number | null;
-  subcategories: KnowledgeDomain[];
+  icon?: string | null;
+  resource_count?: number;
+  subcategories?: KnowledgeDomain[];
 }
 
 export interface License {
@@ -124,11 +127,13 @@ export interface License {
 export interface Institution {
   id: number;
   institution_name: string;
+  name?: string;
   slug: string;
   location?: string | null;
   website?: string | null;
   description?: string | null;
   repository_type?: string | null;
+  resource_count?: number;
 }
 
 export interface SearchResultItem {

@@ -13,14 +13,22 @@ import {
 } from 'lucide-react';
 import { api } from '../api/client';
 import { KnowledgeDomain } from '../types';
+import { FALLBACK_DOMAINS } from '../data/fallbackData';
 
 export const DomainsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedDomains, setExpandedDomains] = useState<Record<number, boolean>>({});
 
-  const { data: domains, isLoading } = useQuery({
+  const { data: domains = FALLBACK_DOMAINS, isLoading } = useQuery({
     queryKey: ['domains-hierarchy'],
-    queryFn: () => api.getDomains(),
+    queryFn: async () => {
+      try {
+        return await api.getDomains();
+      } catch (err) {
+        return FALLBACK_DOMAINS;
+      }
+    },
+    initialData: FALLBACK_DOMAINS,
   });
 
   const toggleExpand = (id: number) => {

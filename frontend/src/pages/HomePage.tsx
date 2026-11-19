@@ -18,24 +18,58 @@ import {
 import { api } from '../api/client';
 import { SearchBar } from '../components/common/SearchBar';
 import { ResourceCard } from '../components/resources/ResourceCard';
+import { FALLBACK_DOMAINS, FALLBACK_RESOURCES, FALLBACK_STATISTICS } from '../data/fallbackData';
 
 export const HomePage: React.FC = () => {
   // Fetch dynamic statistics
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats = FALLBACK_STATISTICS, isLoading: statsLoading } = useQuery({
     queryKey: ['repository-statistics'],
-    queryFn: () => api.getStatistics(),
+    queryFn: async () => {
+      try {
+        return await api.getStatistics();
+      } catch {
+        return FALLBACK_STATISTICS;
+      }
+    },
+    initialData: FALLBACK_STATISTICS,
   });
 
   // Fetch featured / recent resources
   const { data: recentData, isLoading: resourcesLoading } = useQuery({
     queryKey: ['recent-resources'],
-    queryFn: () => api.getResources({ page: 1, page_size: 6, sort_by: 'newest' }),
+    queryFn: async () => {
+      try {
+        return await api.getResources({ page: 1, page_size: 6, sort_by: 'newest' });
+      } catch {
+        return {
+          items: FALLBACK_RESOURCES.slice(0, 6),
+          total: FALLBACK_RESOURCES.length,
+          page: 1,
+          page_size: 6,
+          total_pages: Math.ceil(FALLBACK_RESOURCES.length / 6)
+        };
+      }
+    },
+    initialData: {
+      items: FALLBACK_RESOURCES.slice(0, 6),
+      total: FALLBACK_RESOURCES.length,
+      page: 1,
+      page_size: 6,
+      total_pages: Math.ceil(FALLBACK_RESOURCES.length / 6)
+    },
   });
 
   // Fetch top-level domains
-  const { data: domains } = useQuery({
+  const { data: domains = FALLBACK_DOMAINS } = useQuery({
     queryKey: ['knowledge-domains'],
-    queryFn: () => api.getDomains(),
+    queryFn: async () => {
+      try {
+        return await api.getDomains();
+      } catch {
+        return FALLBACK_DOMAINS;
+      }
+    },
+    initialData: FALLBACK_DOMAINS,
   });
 
   const topDomains = domains ? domains.filter(d => !d.parent_id).slice(0, 8) : [];

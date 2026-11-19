@@ -16,6 +16,12 @@ import {
 import { api } from '../api/client';
 import { ResourceCard } from '../components/resources/ResourceCard';
 import { SearchBar } from '../components/common/SearchBar';
+import {
+  FALLBACK_DOMAINS,
+  FALLBACK_LICENSES,
+  FALLBACK_INSTITUTIONS,
+  FALLBACK_RESOURCES
+} from '../data/fallbackData';
 
 export const ExplorePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,19 +42,40 @@ export const ExplorePage: React.FC = () => {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   // Fetch Taxonomy for Filter Dropdowns
-  const { data: domains } = useQuery({
+  const { data: domains = FALLBACK_DOMAINS } = useQuery({
     queryKey: ['filter-domains'],
-    queryFn: () => api.getDomains(),
+    queryFn: async () => {
+      try {
+        return await api.getDomains();
+      } catch {
+        return FALLBACK_DOMAINS;
+      }
+    },
+    initialData: FALLBACK_DOMAINS,
   });
 
-  const { data: licenses } = useQuery({
+  const { data: licenses = FALLBACK_LICENSES } = useQuery({
     queryKey: ['filter-licenses'],
-    queryFn: () => api.getLicenses(),
+    queryFn: async () => {
+      try {
+        return await api.getLicenses();
+      } catch {
+        return FALLBACK_LICENSES;
+      }
+    },
+    initialData: FALLBACK_LICENSES,
   });
 
-  const { data: institutions } = useQuery({
+  const { data: institutions = FALLBACK_INSTITUTIONS } = useQuery({
     queryKey: ['filter-institutions'],
-    queryFn: () => api.getInstitutions(),
+    queryFn: async () => {
+      try {
+        return await api.getInstitutions();
+      } catch {
+        return FALLBACK_INSTITUTIONS;
+      }
+    },
+    initialData: FALLBACK_INSTITUTIONS,
   });
 
   // Query resources or full-text search
@@ -67,54 +94,102 @@ export const ExplorePage: React.FC = () => {
       page,
     ],
     queryFn: async () => {
-      if (query.trim()) {
-        // Use full-text search engine endpoint
-        const res = await api.search({
-          q: query.trim(),
-          domain_slug: domainSlug || undefined,
-          domain_id: domainId,
-          resource_type: resourceType || undefined,
-          language: language || undefined,
-          access_status: accessStatus || undefined,
-          license_id: licenseId,
-          institution_id: institutionId,
-          sort_by: sortBy,
-          page,
-          page_size: 12,
-        });
+      try {
+        if (query.trim()) {
+          // Use full-text search engine endpoint
+          const res = await api.search({
+            q: query.trim(),
+            domain_slug: domainSlug || undefined,
+            domain_id: domainId,
+            resource_type: resourceType || undefined,
+            language: language || undefined,
+            access_status: accessStatus || undefined,
+            license_id: licenseId,
+            institution_id: institutionId,
+            sort_by: sortBy,
+            page,
+            page_size: 12,
+          });
 
-        // Convert search results to matching Resource format
+          return {
+            total: res.total,
+            page: res.page,
+            page_size: res.page_size,
+            total_pages: res.total_pages,
+            has_next: res.page < res.total_pages,
+            has_prev: res.page > 1,
+            items: res.results.map((r: any) => ({
+              ...r,
+              verification_status: 'Verified',
+              rights_statement: r.license_name || 'Standard Archival Rights',
+              source_url: '',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              primary_domain: r.domain_name ? { id: r.knowledge_domain_id, name: r.domain_name, slug: r.domain_slug || '' } : undefined,
+            })),
+          };
+        } else {
+          // Use standard catalog endpoint
+          return await api.getResources({
+            page,
+            page_size: 12,
+            domain_slug: domainSlug || undefined,
+            domain_id: domainId,
+            resource_type: resourceType || undefined,
+            language: language || undefined,
+            access_status: accessStatus || undefined,
+            license_id: licenseId,
+            institution_id: institutionId,
+            sort_by: sortBy,
+          });
+        }
+      } catch (err) {
+        // Fallback to local catalog filtering if backend is unreachable
+        let items = [...FALLBACK_RESOURCES];
+        if (query.trim()) {
+          const q = query.toLowerCase();
+          items = items.filter(
+            (r) =>
+              r.title.toLowerCase().includes(q) ||
+              r.creator.toLowerCase().includes(q) ||
+              r.description.toLowerCase().includes(q) ||
+              r.subject.toLowerCase().includes(q)
+          );
+        }
+        if (domainId) {
+          items = items.filter((r) => r.knowledge_domain_id === domainId);
+        }
+        if (resourceType) {
+          items = items.filter((r) => r.resource_type === resourceType);
+        }
+        if (language) {
+          items = items.filter((r) => r.language === language);
+        }
+        if (accessStatus) {
+          items = items.filter((r) => r.access_status === accessStatus);
+        }
+        if (licenseId) {
+          items = items.filter((r) => r.license_id === licenseId);
+        }
+        if (institutionId) {
+          items = items.filter((r) => r.institution_id === institutionId);
+        }
+
+        const pageSize = 12;
+        const total = items.length;
+        const totalPages = Math.ceil(total / pageSize) || 1;
+        const start = (page - 1) * pageSize;
+        const paginatedItems = items.slice(start, start + pageSize);
+
         return {
-          total: res.total,
-          page: res.page,
-          page_size: res.page_size,
-          total_pages: res.total_pages,
-          has_next: res.page < res.total_pages,
-          has_prev: res.page > 1,
-          items: res.results.map((r: any) => ({
-            ...r,
-            verification_status: 'Verified',
-            rights_statement: r.license_name || 'Standard Archival Rights',
-            source_url: '',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            primary_domain: r.domain_name ? { id: r.knowledge_domain_id, name: r.domain_name, slug: r.domain_slug || '' } : undefined,
-          })),
-        };
-      } else {
-        // Use standard catalog endpoint
-        return api.getResources({
+          total,
           page,
-          page_size: 12,
-          domain_slug: domainSlug || undefined,
-          domain_id: domainId,
-          resource_type: resourceType || undefined,
-          language: language || undefined,
-          access_status: accessStatus || undefined,
-          license_id: licenseId,
-          institution_id: institutionId,
-          sort_by: sortBy,
-        });
+          page_size: pageSize,
+          total_pages: totalPages,
+          has_next: page < totalPages,
+          has_prev: page > 1,
+          items: paginatedItems,
+        };
       }
     },
   });

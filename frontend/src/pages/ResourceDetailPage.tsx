@@ -25,20 +25,30 @@ import { api } from '../api/client';
 import { Badge } from '../components/common/Badge';
 import { CitationModal } from '../components/common/CitationModal';
 import { ResourceCard } from '../components/resources/ResourceCard';
+import { FALLBACK_RESOURCES } from '../data/fallbackData';
 
 export const ResourceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const resourceId = Number(id);
+  const fallback = FALLBACK_RESOURCES.find((r) => r.id === resourceId);
 
   const [citationModalOpen, setCitationModalOpen] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   // Fetch full details
-  const { data: resource, isLoading, error } = useQuery({
+  const { data: resource = fallback, isLoading, error } = useQuery({
     queryKey: ['resource-detail', resourceId],
-    queryFn: () => api.getResource(resourceId),
+    queryFn: async () => {
+      try {
+        return await api.getResource(resourceId);
+      } catch (err) {
+        if (fallback) return fallback;
+        throw err;
+      }
+    },
     enabled: !isNaN(resourceId),
+    initialData: fallback,
   });
 
   const handleDownload = async () => {
