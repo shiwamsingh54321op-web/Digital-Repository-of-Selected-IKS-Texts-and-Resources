@@ -5,6 +5,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com)
 [![SQLite FTS5](https://img.shields.io/badge/Search-SQLite_FTS5_%2B_BM25-003B57.svg?logo=sqlite)](https://www.sqlite.org/fts5.html)
 [![Dublin Core](https://img.shields.io/badge/Metadata-Dublin_Core_ISO_15836-B8860B.svg)](https://www.dublincore.org)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000.svg?logo=vercel)](docs/vercel-deployment.md)
 
 An academic-grade digital library and information retrieval prototype dedicated to the **Indian Knowledge Systems (IKS)**. Engineered to categorize, index, search, and legally govern classical Indian texts, manuscripts, translations, and research resources following **Dublin Core ISO 15836** metadata standards and **SQLite FTS5 BM25** probabilistic ranking.
 
@@ -175,6 +176,15 @@ Run the backend test suite:
 cd backend
 pytest tests/test_database.py tests/test_search.py
 ```
+
+---
+
+## Cloud Deployment (Vercel)
+
+The repository includes native configuration for zero-config Vercel deployment:
+- **Root configuration**: [`vercel.json`](file:///vercel.json) handles build, static assets, and client-side routing.
+- **Serverless API**: [`api/index.py`](file:///api/index.py) runs the FastAPI backend as a Vercel serverless function with auto-seeded SQLite storage.
+- Detailed step-by-step setup is documented in [docs/vercel-deployment.md](file:///docs/vercel-deployment.md).
 
 ---
 

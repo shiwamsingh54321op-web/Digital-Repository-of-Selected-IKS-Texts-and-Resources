@@ -14,7 +14,8 @@ import {
   AdminAnalyticsData
 } from '../types';
 
-const API_BASE = '/api';
+const metaEnv = (import.meta as any)?.env || {};
+const API_BASE = (metaEnv.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
 
 export class ApiError extends Error {
   status: number;
