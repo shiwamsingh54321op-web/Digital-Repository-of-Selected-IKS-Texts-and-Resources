@@ -14,7 +14,7 @@ sys.path.insert(0, str(root_dir))
 if os.environ.get("VERCEL"):
     os.environ.setdefault("DATABASE_URL", "sqlite:////tmp/iks_repository.db")
 
-from app.main import app, init_db
+from app.main import app, init_db, sync_domain_resource_links
 from app.database.session import SessionLocal, engine, Base
 from app.models import Resource
 import logging
@@ -30,6 +30,7 @@ try:
         if count == 0:
             from scripts.seed_data import seed_database
             seed_database()
+            sync_domain_resource_links(db)
     finally:
         db.close()
 except Exception as e:
