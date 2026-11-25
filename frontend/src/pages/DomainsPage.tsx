@@ -80,6 +80,25 @@ export const DomainsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Brief Historical Note on IKS Classification */}
+      <div className="bg-white border border-ivory-300 rounded-xl p-5 mb-8 shadow-parchment flex flex-col md:flex-row items-center gap-5">
+        <img
+          src="/images/iks-manuscripts.jpg"
+          alt="Classical palm-leaf manuscript classification"
+          loading="lazy"
+          decoding="async"
+          className="w-full md:w-48 h-28 object-cover rounded-lg border border-ivory-200 flex-shrink-0"
+        />
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-mono text-gold-700 uppercase tracking-widest font-semibold">
+            Did You Know? • Vidyāsthāna Taxonomy
+          </span>
+          <p className="text-xs sm:text-sm text-navy-700 leading-relaxed">
+            Classical Indian scholarship organizes knowledge into <strong>Parā Vidyā</strong> (philosophical and spiritual inquiry) and <strong>Aparā Vidyā</strong> (empirical sciences, grammar, mathematics, medicine, and the 64 arts or <em>Kalās</em>). Historically grouped as the 14 or 18 <em>Vidyāsthānas</em>, these branches evolved together—linking linguistics with algorithmic logic, and astronomy with geometry.
+          </p>
+        </div>
+      </div>
+
       {/* Grid of Domains */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

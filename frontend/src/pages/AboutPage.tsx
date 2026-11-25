@@ -48,6 +48,43 @@ export const AboutPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Visual Heritage Context */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {[
+          {
+            img: '/images/iks-gurukul.jpg',
+            title: 'Ancient Centers of Learning',
+            caption: 'Universities such as Takṣaśilā and Nālandā housed vast manuscript libraries and fostered interdisciplinary scholarship across Asia.'
+          },
+          {
+            img: '/images/iks-astronomy.jpg',
+            title: 'Empirical Observation',
+            caption: 'From Vedic calendars to Jaipur’s Jantar Mantar, Indian astronomy paired mathematical Siddhāntas with precision instruments.'
+          },
+          {
+            img: '/images/iks-architecture.jpg',
+            title: 'Engineering & Heritage',
+            caption: 'Śilpa and Vāstu texts codified geometry, acoustics, and sustainable water conservation still visible in India’s heritage monuments.'
+          }
+        ].map((card, idx) => (
+          <div key={idx} className="bg-white border border-ivory-300 rounded-xl overflow-hidden shadow-parchment">
+            <div className="aspect-[16/9] w-full overflow-hidden bg-ivory-100 border-b border-ivory-200">
+              <img
+                src={card.img}
+                alt={card.title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-4 space-y-1">
+              <h3 className="font-serif text-sm font-bold text-navy-950">{card.title}</h3>
+              <p className="text-xs text-navy-600 leading-relaxed">{card.caption}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Core Architectural Components */}
       <div className="space-y-6">
         <h2 className="font-serif text-2xl font-bold text-navy-950 border-b border-ivory-300 pb-2">

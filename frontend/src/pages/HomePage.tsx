@@ -282,6 +282,95 @@ export const HomePage: React.FC = () => {
         )}
       </section>
 
+      {/* Visual Heritage & IKS Context (Informative Showcase) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-2 text-xs font-mono text-gold-700 uppercase tracking-widest mb-1">
+            <Compass className="w-4 h-4" />
+            <span>Heritage &amp; Historical Context</span>
+          </div>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-navy-950">
+            Glimpses of Indian Knowledge Traditions
+          </h2>
+          <p className="text-sm text-navy-600 mt-1">
+            Brief introductions to the living sciences, manuscripts, and scholarly institutions preserved in this archive.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            {
+              title: 'Vedas, Upanishads & Manuscripts',
+              tag: 'Śruti & Tāla-patra',
+              img: '/images/iks-manuscripts.jpg',
+              alt: 'Ancient Indian palm-leaf manuscripts with Devanagari script',
+              fact: 'Over 5 million surviving palm-leaf (Tāla-patra) and birch-bark manuscripts preserve India’s intellectual heritage—from the Rigveda, the oldest surviving Indo-European text, to the philosophical Upanishads.'
+            },
+            {
+              title: 'Indian Mathematics (Gaṇita)',
+              tag: 'Śulba Sūtras & Decimal System',
+              img: '/images/iks-mathematics.jpg',
+              alt: 'Classical Indian mathematical instruments and geometric diagrams',
+              fact: 'Baudhāyana (c. 800 BCE) formulated geometric principles akin to the Pythagorean theorem for Vedic altars, while Āryabhaṭa (499 CE) and Brahmagupta (628 CE) formalized zero, place-value arithmetic, and trigonometry.'
+            },
+            {
+              title: 'Astronomy & Observatories (Jyotiṣa)',
+              tag: 'Siddhāntas & Jantar Mantar',
+              img: '/images/iks-astronomy.jpg',
+              alt: 'Samrat Yantra stone sundial at Jantar Mantar, Jaipur',
+              fact: 'Classical Siddhāntic astronomers computed planetary longitudes, Earth’s axial rotation, and eclipses—later embodied in monumental masonry observatories like Jaipur’s Jantar Mantar (1734 CE).'
+            },
+            {
+              title: 'Āyurveda & Classical Yoga',
+              tag: 'Holistic Health & Prāṇa',
+              img: '/images/iks-ayurveda-yoga.jpg',
+              alt: 'Traditional Ayurvedic medicinal herbs and botanicals',
+              fact: 'Grounded in the Caraka Saṁhitā, Suśruta Saṁhitā (describing over 300 surgical procedures), and Patañjali’s Yoga Sūtras, these twin disciplines balance bodily humors (Tridoṣa), breath, and mind.'
+            },
+            {
+              title: 'Architecture & Water Systems (Vāstu)',
+              tag: 'Śilpa Śāstra & Stepwells',
+              img: '/images/iks-architecture.jpg',
+              alt: 'Classical Indian temple stonework and stepped Kund water tank',
+              fact: 'Vāstu Vidyā and Śilpa Śāstra treatises integrated sacred geometry, structural acoustics, and climate-responsive design—exemplified by intricately carved temples and rainwater-harvesting stepped Kuṇḍs.'
+            },
+            {
+              title: 'Gurukul & Ancient Universities',
+              tag: 'Nālandā & Takṣaśilā',
+              img: '/images/iks-gurukul.jpg',
+              alt: 'Historic brick monastery courtyard at Nalanda University',
+              fact: 'In the Gurukul system and great residential centers like Takṣaśilā and Nālandā (5th–12th century CE), scholars debated logic, medicine, grammar, and astronomy through structured inquiry (Śāstrārtha).'
+            }
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="bg-white border border-ivory-300 rounded-xl overflow-hidden shadow-parchment hover:border-gold-400 transition-all flex flex-col"
+            >
+              <div className="aspect-[16/9] w-full overflow-hidden bg-ivory-100 border-b border-ivory-200">
+                <img
+                  src={item.img}
+                  alt={item.alt}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-5 flex-1 flex flex-col">
+                <span className="text-[11px] font-mono text-gold-700 uppercase tracking-wider font-semibold">
+                  {item.tag}
+                </span>
+                <h3 className="font-serif text-base font-bold text-navy-950 mt-1 mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-navy-600 leading-relaxed">
+                  {item.fact}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Architectural Pillars / College Assignment Scope */}
       <section className="bg-navy-900 text-ivory-50 border-y border-gold-500/30 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
