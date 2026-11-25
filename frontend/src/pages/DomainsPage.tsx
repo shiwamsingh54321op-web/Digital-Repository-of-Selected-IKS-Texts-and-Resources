@@ -128,12 +128,14 @@ export const DomainsPage: React.FC = () => {
                         </span>
                       </div>
                       <h2 className="font-serif text-xl font-bold text-navy-950">
-                        {domain.name}
+                        <Link to={`/domains/${domain.slug}`} className="hover:text-gold-700 transition-colors">
+                          {domain.name}
+                        </Link>
                       </h2>
                     </div>
 
                     <Link
-                      to={`/explore?domain_slug=${domain.slug}`}
+                      to={`/domains/${domain.slug}`}
                       className="px-3 py-1.5 bg-navy-900 hover:bg-navy-800 text-gold-300 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 shadow-sm flex-shrink-0"
                     >
                       <Compass className="w-3.5 h-3.5" />
@@ -165,7 +167,7 @@ export const DomainsPage: React.FC = () => {
                         domain.subcategories.map((sub) => (
                           <Link
                             key={sub.id}
-                            to={`/explore?domain_slug=${sub.slug}`}
+                            to={`/domains/${sub.slug}`}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-ivory-300 hover:border-gold-500 hover:bg-gold-50/60 rounded-lg text-xs text-navy-800 font-medium transition-all group shadow-2xs"
                           >
                             <span className="group-hover:text-gold-800 transition-colors">

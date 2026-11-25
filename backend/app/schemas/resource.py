@@ -131,6 +131,7 @@ class ResourceDetailResponse(ResourceResponse):
     dublin_core: Optional[DublinCoreMetadata] = None
     can_download: bool = False
     related_resources: List[ResourceResponse] = []
+    educational_guide: Optional[Dict[str, Any]] = None
 
     model_config = ConfigDict(from_attributes=True)
 

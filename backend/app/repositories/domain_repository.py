@@ -36,14 +36,34 @@ class DomainRepository:
 
     @staticmethod
     def get_resource_counts(db: Session) -> dict:
-        """Calculate verified resource counts per domain."""
+        """Calculate verified resource counts per domain (primary + secondary associations)."""
+        from app.models.domain import resource_domains
+        from sqlalchemy import union_all, select
+
+        primary_q = (
+            select(
+                Resource.knowledge_domain_id.label("domain_id"),
+                Resource.id.label("resource_id")
+            )
+            .where(Resource.verification_status == "Verified")
+        )
+        secondary_q = (
+            select(
+                resource_domains.c.domain_id.label("domain_id"),
+                resource_domains.c.resource_id.label("resource_id")
+            )
+            .select_from(
+                resource_domains.join(Resource, resource_domains.c.resource_id == Resource.id)
+            )
+            .where(Resource.verification_status == "Verified")
+        )
+        combined = union_all(primary_q, secondary_q).subquery()
         rows = (
             db.query(
-                Resource.knowledge_domain_id,
-                func.count(Resource.id).label("count")
+                combined.c.domain_id,
+                func.count(func.distinct(combined.c.resource_id)).label("count")
             )
-            .filter(Resource.verification_status == "Verified")
-            .group_by(Resource.knowledge_domain_id)
+            .group_by(combined.c.domain_id)
             .all()
         )
         return {r[0]: r[1] for r in rows}

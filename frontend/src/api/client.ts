@@ -3,6 +3,7 @@ import {
   ResourceDetail,
   PaginatedResources,
   KnowledgeDomain,
+  DomainDetailResponse,
   License,
   Institution,
   SearchResponse,
@@ -166,7 +167,7 @@ export const api = {
 
   // Taxonomy & Metadata
   getDomains: () => request<KnowledgeDomain[]>('/domains'),
-  getDomain: (identifier: string | number) => request<KnowledgeDomain>(`/domains/${identifier}`),
+  getDomain: (identifier: string | number) => request<DomainDetailResponse>(`/domains/${identifier}`),
 
   getLicenses: () => request<License[]>('/licenses'),
   getLicense: (id: number) => request<License>(`/licenses/${id}`),

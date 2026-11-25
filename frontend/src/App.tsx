@@ -7,6 +7,7 @@ import { Footer } from './components/layout/Footer';
 import { HomePage } from './pages/HomePage';
 import { ExplorePage } from './pages/ExplorePage';
 import { DomainsPage } from './pages/DomainsPage';
+import { DomainDetailPage } from './pages/DomainDetailPage';
 import { ResourceDetailPage } from './pages/ResourceDetailPage';
 import { AboutPage } from './pages/AboutPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
@@ -56,6 +57,7 @@ export const App: React.FC = () => {
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/search" element={<ExplorePage />} />
               <Route path="/domains" element={<DomainsPage />} />
+              <Route path="/domains/:slug" element={<DomainDetailPage />} />
               <Route path="/resources/:id" element={<ResourceDetailPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />

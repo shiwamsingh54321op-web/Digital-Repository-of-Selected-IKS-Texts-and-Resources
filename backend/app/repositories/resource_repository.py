@@ -49,10 +49,25 @@ class ResourceRepository:
         if verification_status:
             query = query.filter(Resource.verification_status == verification_status)
 
-        if domain_id is not None:
-            query = query.filter(Resource.knowledge_domain_id == domain_id)
-        elif domain_slug:
-            query = query.join(Resource.primary_domain).filter(KnowledgeDomain.slug == domain_slug)
+        if domain_id is not None or domain_slug:
+            target_domain = (
+                db.query(KnowledgeDomain).filter(KnowledgeDomain.id == domain_id).first()
+                if domain_id is not None
+                else db.query(KnowledgeDomain).filter(KnowledgeDomain.slug == domain_slug).first()
+            )
+            if target_domain:
+                sub_ids = [s.id for s in db.query(KnowledgeDomain.id).filter(KnowledgeDomain.parent_id == target_domain.id).all()]
+                match_ids = [target_domain.id] + sub_ids
+                query = query.filter(
+                    or_(
+                        Resource.knowledge_domain_id.in_(match_ids),
+                        Resource.domains.any(KnowledgeDomain.id.in_(match_ids))
+                    )
+                )
+            elif domain_id is not None:
+                query = query.filter(Resource.knowledge_domain_id == domain_id)
+            else:
+                query = query.filter(Resource.id == -1)
 
         if resource_type:
             query = query.filter(Resource.resource_type == resource_type)

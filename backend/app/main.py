@@ -35,12 +35,38 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def sync_domain_resource_links(db):
+    """Ensure all 52 domains and subcategories are linked to their relevant resources."""
+    from app.data.domain_profiles import DOMAIN_PROFILES
+    from app.models.domain import resource_domains
+    from sqlalchemy import insert
+
+    domains_by_slug = {d.slug: d.id for d in db.query(KnowledgeDomain).all()}
+    existing_resource_ids = {r.id for r in db.query(Resource.id).all()}
+    existing_links = set(db.execute(resource_domains.select()).fetchall())
+
+    added = 0
+    for slug, profile in DOMAIN_PROFILES.items():
+        dom_id = domains_by_slug.get(slug)
+        if not dom_id:
+            continue
+        for res_id in profile.get("linked_resource_ids", []):
+            if res_id in existing_resource_ids and (res_id, dom_id) not in existing_links:
+                db.execute(insert(resource_domains).values(resource_id=res_id, domain_id=dom_id))
+                existing_links.add((res_id, dom_id))
+                added += 1
+    if added > 0:
+        db.commit()
+        logger.info(f"Synchronized {added} domain-resource associations across 52 domains.")
+
+
 def init_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         init_fts_index(db)
         AuthService.ensure_default_admin(db)
+        sync_domain_resource_links(db)
     finally:
         db.close()
 

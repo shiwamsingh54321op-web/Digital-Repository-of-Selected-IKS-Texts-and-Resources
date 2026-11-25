@@ -80,6 +80,16 @@ export interface Resource {
   institution_ref?: InstitutionSimple | null;
 }
 
+export interface ResourceEducationalGuide {
+  subject_introduction: string;
+  historical_context: string;
+  learning_objectives: string[];
+  chapters_and_topics: { section: string; topics: string }[];
+  sanskrit_terminology: { term: string; meaning: string }[];
+  examples: string[];
+  recommended_reading: string[];
+}
+
 export interface ResourceDetail extends Resource {
   dublin_core: DublinCoreMetadata;
   can_download?: boolean;
@@ -87,6 +97,8 @@ export interface ResourceDetail extends Resource {
   download_restriction_reason?: string | null;
   related_resources?: Resource[];
   citations?: Record<string, string>;
+  educational_guide?: ResourceEducationalGuide | null;
+  domains?: KnowledgeDomainSimple[];
 }
 
 export interface PaginatedResources {
@@ -99,6 +111,19 @@ export interface PaginatedResources {
   items: Resource[];
 }
 
+export interface DomainProfile {
+  sanskrit_name?: string;
+  introduction?: string;
+  detailed_explanation?: string;
+  historical_background?: string;
+  important_concepts?: { term: string; meaning: string }[];
+  major_contributors?: { name: string; era: string; contribution: string }[];
+  important_texts?: { title: string; author: string; period: string }[];
+  practical_applications?: string[];
+  references?: { label: string; url: string }[];
+  linked_resource_ids?: number[];
+}
+
 export interface KnowledgeDomain {
   id: number;
   name: string;
@@ -108,7 +133,16 @@ export interface KnowledgeDomain {
   parent_id?: number | null;
   icon?: string | null;
   resource_count?: number;
+  profile?: DomainProfile | null;
   subcategories?: KnowledgeDomain[];
+}
+
+export interface DomainDetailResponse {
+  domain: KnowledgeDomain;
+  parent_domain?: KnowledgeDomainSimple | null;
+  subcategories: KnowledgeDomain[];
+  total_resources: number;
+  resources: Resource[];
 }
 
 export interface License {

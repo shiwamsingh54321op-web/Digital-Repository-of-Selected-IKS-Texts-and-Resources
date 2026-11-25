@@ -92,6 +92,8 @@ class ResourceService:
         dc = cls.build_dublin_core(resource)
         can_download = cls.can_download_resource(resource)
         related = ResourceRepository.get_related(db, resource, limit=4)
+        from app.data.resource_education import RESOURCE_EDUCATION
+        edu_guide = RESOURCE_EDUCATION.get(resource.id)
 
         return ResourceDetailResponse(
             id=resource.id,
@@ -133,5 +135,6 @@ class ResourceService:
             institution_ref=resource.institution_ref,
             dublin_core=dc,
             can_download=can_download,
-            related_resources=related
+            related_resources=related,
+            educational_guide=edu_guide
         )

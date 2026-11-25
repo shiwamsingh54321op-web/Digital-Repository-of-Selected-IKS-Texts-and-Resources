@@ -11,6 +11,8 @@ from app.repositories.domain_repository import DomainRepository
 from app.repositories.resource_repository import ResourceRepository
 from app.services.resource_service import ResourceService
 from app.models import License, Institution
+from app.data.domain_profiles import DOMAIN_PROFILES
+from app.data.resource_education import RESOURCE_EDUCATION
 
 db = SessionLocal()
 
@@ -22,25 +24,29 @@ domains_list = []
 for d in hierarchy:
     subs = []
     for s in getattr(d, 'subcategories', []):
+        s_prof = DOMAIN_PROFILES.get(s.slug, {})
         subs.append({
             'id': s.id,
             'name': s.name,
             'slug': s.slug,
-            'sanskrit_name': getattr(s, 'sanskrit_name', None) or s.name,
+            'sanskrit_name': s_prof.get('sanskrit_name') or s.name,
             'description': s.description,
             'parent_id': s.parent_id,
             'icon': s.icon,
             'resource_count': counts.get(s.id, 0),
+            'profile': s_prof or None,
         })
+    d_prof = DOMAIN_PROFILES.get(d.slug, {})
     domains_list.append({
         'id': d.id,
         'name': d.name,
         'slug': d.slug,
-        'sanskrit_name': getattr(d, 'sanskrit_name', None) or d.name,
+        'sanskrit_name': d_prof.get('sanskrit_name') or d.name,
         'description': d.description,
         'parent_id': d.parent_id,
         'icon': d.icon,
         'resource_count': counts.get(d.id, 0),
+        'profile': d_prof or None,
         'subcategories': subs,
     })
 
@@ -151,6 +157,11 @@ for r in resources:
         'can_download': can_download,
         'download_allowed': can_download,
         'download_restriction_reason': reason,
+        'educational_guide': RESOURCE_EDUCATION.get(r.id),
+        'domains': [
+            {'id': dom.id, 'name': dom.name, 'slug': dom.slug}
+            for dom in (r.domains or ([r.primary_domain] if r.primary_domain else []))
+        ],
     })
 
 # 5. Statistics

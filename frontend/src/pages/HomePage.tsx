@@ -213,7 +213,7 @@ export const HomePage: React.FC = () => {
           {topDomains.map((domain) => (
             <Link
               key={domain.id}
-              to={`/explore?domain_slug=${domain.slug}`}
+              to={`/domains/${domain.slug}`}
               className="bg-white border border-ivory-300 rounded-xl p-5 hover:border-gold-500 hover:shadow-parchment-lg transition-all group flex flex-col justify-between"
             >
               <div>

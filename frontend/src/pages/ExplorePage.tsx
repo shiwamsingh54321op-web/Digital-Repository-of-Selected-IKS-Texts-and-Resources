@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Filter,
@@ -157,7 +157,21 @@ export const ExplorePage: React.FC = () => {
           );
         }
         if (domainId) {
-          items = items.filter((r) => r.knowledge_domain_id === domainId);
+          items = items.filter(
+            (r) => r.knowledge_domain_id === domainId || r.domains?.some((d) => d.id === domainId)
+          );
+        }
+        if (domainSlug) {
+          const allDomains = FALLBACK_DOMAINS.flatMap((d) => [d, ...(d.subcategories || [])]);
+          const matchedDom = allDomains.find((d) => d.slug === domainSlug);
+          const subSlugs = new Set((matchedDom?.subcategories || []).map((s) => s.slug));
+          const linkedIds = new Set(matchedDom?.profile?.linked_resource_ids || []);
+          items = items.filter(
+            (r) =>
+              linkedIds.has(r.id) ||
+              r.primary_domain?.slug === domainSlug ||
+              r.domains?.some((d) => d.slug === domainSlug || subSlugs.has(d.slug))
+          );
         }
         if (resourceType) {
           items = items.filter((r) => r.resource_type === resourceType);
@@ -239,6 +253,31 @@ export const ExplorePage: React.FC = () => {
             placeholder="Search treatises, creators, subjects, or keywords..."
           />
         </div>
+
+        {/* Active Domain Context Strip */}
+        {domainSlug && (() => {
+          const allDoms = (domains || FALLBACK_DOMAINS).flatMap((d) => [d, ...(d.subcategories || [])]);
+          const activeDom = allDoms.find((d) => d.slug === domainSlug);
+          if (!activeDom) return null;
+          return (
+            <div className="mt-5 bg-white border border-gold-300/70 rounded-xl p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-xs font-mono text-gold-700 font-semibold">
+                  <span>{activeDom.sanskrit_name || 'Knowledge Domain'}</span>
+                </div>
+                <p className="text-xs text-navy-700 leading-relaxed">
+                  {activeDom.profile?.introduction || activeDom.description}
+                </p>
+              </div>
+              <Link
+                to={`/domains/${activeDom.slug}`}
+                className="px-3.5 py-2 bg-navy-900 hover:bg-navy-800 text-gold-300 rounded-lg text-xs font-medium whitespace-nowrap flex-shrink-0 text-center"
+              >
+                Read Full Domain Guide →
+              </Link>
+            </div>
+          );
+        })()}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">

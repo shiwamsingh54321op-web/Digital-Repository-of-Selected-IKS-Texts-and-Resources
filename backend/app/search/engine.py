@@ -285,10 +285,14 @@ class SearchEngine:
 
         # Faceted filters
         if domain_id is not None:
-            where_clauses.append("r.knowledge_domain_id = :domain_id")
+            where_clauses.append(
+                "(r.knowledge_domain_id = :domain_id OR r.knowledge_domain_id IN (SELECT id FROM knowledge_domains WHERE parent_id = :domain_id) OR r.id IN (SELECT resource_id FROM resource_domains WHERE domain_id = :domain_id))"
+            )
             params["domain_id"] = domain_id
         elif domain_slug:
-            where_clauses.append("d.slug = :domain_slug")
+            where_clauses.append(
+                "(d.slug = :domain_slug OR d.parent_id IN (SELECT id FROM knowledge_domains WHERE slug = :domain_slug) OR r.id IN (SELECT rd.resource_id FROM resource_domains rd JOIN knowledge_domains kd ON rd.domain_id = kd.id WHERE kd.slug = :domain_slug))"
+            )
             params["domain_slug"] = domain_slug
 
         if resource_type:

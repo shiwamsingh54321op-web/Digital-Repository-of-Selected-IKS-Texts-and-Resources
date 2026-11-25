@@ -246,7 +246,7 @@ export const ResourceDetailPage: React.FC = () => {
             </button>
           )}
 
-          {/* External Source Link */}
+          {/* External Source / Read Online Link */}
           {resource.access_url && (
             <a
               href={resource.access_url}
@@ -255,7 +255,7 @@ export const ResourceDetailPage: React.FC = () => {
               className="px-4 py-2.5 bg-navy-900 hover:bg-navy-800 text-gold-300 rounded-xl text-xs font-medium flex items-center gap-2 shadow-sm transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span>View at Holding Archive</span>
+              <span>{resource.access_status === 'Read Online' ? 'Read Online at Archive' : 'View at Holding Archive'}</span>
             </a>
           )}
 
@@ -332,6 +332,107 @@ export const ResourceDetailPage: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Educational Study Guide & Textual Structure */}
+          {resource.educational_guide && (
+            <div className="bg-white border border-ivory-300 rounded-2xl p-6 sm:p-8 shadow-parchment space-y-6">
+              <div className="flex items-center justify-between pb-3 border-b border-ivory-200">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-gold-600" />
+                  <h2 className="font-serif text-xl font-bold text-navy-950">
+                    Educational Study Guide &amp; Textual Overview
+                  </h2>
+                </div>
+                <span className="text-[11px] font-mono text-gold-800 bg-gold-50 px-2.5 py-0.5 rounded-full border border-gold-200">
+                  Learning Module
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xs font-mono uppercase tracking-wider font-bold text-navy-700">
+                  Subject Introduction &amp; Historical Context
+                </h3>
+                <p className="text-sm text-navy-800 leading-relaxed">
+                  {resource.educational_guide.subject_introduction}
+                </p>
+                <p className="text-xs text-navy-600 leading-relaxed">
+                  {resource.educational_guide.historical_context}
+                </p>
+              </div>
+
+              {resource.educational_guide.learning_objectives.length > 0 && (
+                <div className="bg-ivory-50 border border-ivory-200 rounded-xl p-4 space-y-2">
+                  <h3 className="text-xs font-mono uppercase tracking-wider font-bold text-navy-800">
+                    Key Learning Objectives
+                  </h3>
+                  <ul className="space-y-1.5 text-xs text-navy-700">
+                    {resource.educational_guide.learning_objectives.map((obj, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                        <span>{obj}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {resource.educational_guide.chapters_and_topics.length > 0 && (
+                <div className="space-y-2.5">
+                  <h3 className="text-xs font-mono uppercase tracking-wider font-bold text-navy-700">
+                    Chapters, Sections &amp; Core Topics
+                  </h3>
+                  <div className="divide-y divide-ivory-200 border border-ivory-200 rounded-xl overflow-hidden text-xs">
+                    {resource.educational_guide.chapters_and_topics.map((ch, idx) => (
+                      <div key={idx} className="p-3 bg-white hover:bg-ivory-50/70 transition-colors">
+                        <div className="font-semibold text-navy-950">{ch.section}</div>
+                        <div className="text-navy-600 mt-0.5 leading-relaxed">{ch.topics}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {resource.educational_guide.sanskrit_terminology.length > 0 && (
+                <div className="space-y-2.5">
+                  <h3 className="text-xs font-mono uppercase tracking-wider font-bold text-navy-700">
+                    Key Sanskrit Terminology &amp; Definitions
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {resource.educational_guide.sanskrit_terminology.map((t, idx) => (
+                      <div key={idx} className="p-3 bg-ivory-50 border border-ivory-200 rounded-lg text-xs">
+                        <span className="font-serif font-bold text-navy-950 block">{t.term}</span>
+                        <span className="text-navy-600 leading-relaxed">{t.meaning}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {resource.educational_guide.examples.length > 0 && (
+                <div className="bg-gold-50/50 border-l-4 border-gold-500 p-4 rounded-r-lg space-y-1">
+                  <h3 className="text-xs font-mono uppercase tracking-wider font-bold text-navy-800">
+                    Illustrative Example from the Text
+                  </h3>
+                  {resource.educational_guide.examples.map((ex, idx) => (
+                    <p key={idx} className="text-xs text-navy-800 leading-relaxed">{ex}</p>
+                  ))}
+                </div>
+              )}
+
+              {resource.educational_guide.recommended_reading.length > 0 && (
+                <div className="pt-2 border-t border-ivory-200 space-y-1.5">
+                  <h3 className="text-xs font-mono uppercase tracking-wider font-bold text-navy-700">
+                    Recommended Academic Reading
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-xs text-navy-600">
+                    {resource.educational_guide.recommended_reading.map((rec, idx) => (
+                      <li key={idx}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Full Dublin Core 15-Element Metadata Table */}
           <div className="bg-white border border-ivory-300 rounded-2xl p-6 sm:p-8 shadow-parchment overflow-hidden">

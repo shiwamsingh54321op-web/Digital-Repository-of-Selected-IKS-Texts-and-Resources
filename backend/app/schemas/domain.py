@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -27,6 +27,8 @@ class KnowledgeDomainResponse(KnowledgeDomainBase):
     id: int
     created_at: datetime
     resource_count: Optional[int] = 0
+    sanskrit_name: Optional[str] = None
+    profile: Optional[Dict[str, Any]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
