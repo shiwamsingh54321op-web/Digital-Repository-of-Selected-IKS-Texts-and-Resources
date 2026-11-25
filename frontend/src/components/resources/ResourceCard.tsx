@@ -28,8 +28,15 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
       try {
         const data = await api.getCitations(resource.id);
         setCitations(data);
-      } catch (err) {
-        console.error('Failed to load citations', err);
+      } catch {
+        const year = resource.publication_date || 'n.d.';
+        const url = resource.source_url || window.location.origin;
+        setCitations({
+          apa: `${resource.creator}. (${year}). ${resource.title}. ${resource.source_institution}. ${url}`,
+          mla: `${resource.creator}. "${resource.title}." ${resource.source_institution}, ${year}, ${url}.`,
+          chicago: `${resource.creator}. ${resource.title}. ${resource.source_institution}, ${year}. ${url}.`,
+          bibtex: `@misc{iks_${resource.id},\n  author = {${resource.creator}},\n  title = {${resource.title}},\n  year = {${year}},\n  publisher = {${resource.source_institution}},\n  url = {${url}},\n  note = {Accessed via IKS Digital Repository}\n}`,
+        });
       } finally {
         setIsLoadingCitation(false);
       }

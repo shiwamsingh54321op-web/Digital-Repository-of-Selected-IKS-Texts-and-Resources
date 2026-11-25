@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X, Book, Tag, User, ArrowRight } from 'lucide-react';
 import { api } from '../../api/client';
 import { SearchSuggestionItem } from '../../types';
+import { FALLBACK_RESOURCES } from '../../data/fallbackData';
 
 interface SearchBarProps {
   initialValue?: string;
@@ -57,8 +58,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         const results = await api.getSuggestions(trimmed, 7);
         setSuggestions(results);
         setIsOpen(results.length > 0);
-      } catch (err) {
-        console.error('Failed to fetch suggestions', err);
+      } catch {
+        const q = trimmed.toLowerCase();
+        const localSuggestions: SearchSuggestionItem[] = [];
+        for (const r of FALLBACK_RESOURCES) {
+          if (r.title.toLowerCase().includes(q)) {
+            localSuggestions.push({ text: r.title, type: 'title', matched_id: r.id });
+          } else if (r.creator.toLowerCase().includes(q) && !localSuggestions.some((s) => s.text === r.creator)) {
+            localSuggestions.push({ text: r.creator, type: 'creator', matched_id: null });
+          } else if (r.subject.toLowerCase().includes(q) && !localSuggestions.some((s) => s.text === r.subject)) {
+            localSuggestions.push({ text: r.subject, type: 'keyword', matched_id: null });
+          }
+          if (localSuggestions.length >= 7) break;
+        }
+        setSuggestions(localSuggestions);
+        setIsOpen(localSuggestions.length > 0);
       } finally {
         setIsLoading(false);
       }

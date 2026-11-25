@@ -79,6 +79,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     return {} as T;
   }
 
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new ApiError(response.status || 502, 'API endpoint returned non-JSON response');
+  }
+
   return response.json();
 }
 

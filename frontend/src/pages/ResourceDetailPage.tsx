@@ -56,21 +56,38 @@ export const ResourceDetailPage: React.FC = () => {
     setIsDownloading(true);
     try {
       const res = await fetch(api.getDownloadUrl(resourceId));
+      const contentType = res.headers.get('content-type') || '';
       if (!res.ok) {
         let errMessage = 'Download not permitted under current rights policy.';
-        try {
-          const err = await res.json();
-          if (err.detail) errMessage = err.detail;
-        } catch {}
+        if (contentType.includes('application/json')) {
+          try {
+            const err = await res.json();
+            if (err.detail) errMessage = err.detail;
+          } catch {}
+        }
         setDownloadError(errMessage);
         return;
       }
-      const data = await res.json();
-      if (data.download_url) {
-        window.open(data.download_url, '_blank');
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.download_url) {
+          window.open(data.download_url, '_blank');
+          return;
+        }
+      }
+      const fallbackUrl = resource?.download_url || resource?.access_url || resource?.source_url;
+      if (fallbackUrl && (resource?.can_download ?? resource?.download_allowed)) {
+        window.open(fallbackUrl, '_blank');
+      } else {
+        setDownloadError('Direct download is not available for this resource.');
       }
     } catch {
-      setDownloadError('Unable to connect to download verification server.');
+      const fallbackUrl = resource?.download_url || resource?.access_url || resource?.source_url;
+      if (fallbackUrl && (resource?.can_download ?? resource?.download_allowed)) {
+        window.open(fallbackUrl, '_blank');
+      } else {
+        setDownloadError('Unable to connect to download verification server.');
+      }
     } finally {
       setIsDownloading(false);
     }
@@ -79,15 +96,36 @@ export const ResourceDetailPage: React.FC = () => {
   // Fetch citations
   const { data: citations, isLoading: citationsLoading } = useQuery({
     queryKey: ['resource-citations', resourceId],
-    queryFn: () => api.getCitations(resourceId),
+    queryFn: async () => {
+      try {
+        return await api.getCitations(resourceId);
+      } catch {
+        if (fallback?.citations) {
+          return fallback.citations as any;
+        }
+        throw new Error('Citations unavailable');
+      }
+    },
     enabled: !isNaN(resourceId),
+    initialData: fallback?.citations as any,
   });
 
   // Fetch related resources
+  const localRelated = FALLBACK_RESOURCES.filter(
+    (r) => r.id !== resourceId && (!fallback || r.knowledge_domain_id === fallback.knowledge_domain_id)
+  ).slice(0, 3);
+
   const { data: related } = useQuery({
     queryKey: ['related-resources', resourceId],
-    queryFn: () => api.getRelatedResources(resourceId, 3),
+    queryFn: async () => {
+      try {
+        return await api.getRelatedResources(resourceId, 3);
+      } catch {
+        return localRelated;
+      }
+    },
     enabled: !isNaN(resourceId),
+    initialData: localRelated,
   });
 
   if (isLoading) {
